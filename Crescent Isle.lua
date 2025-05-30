@@ -11,7 +11,7 @@ local CRYSTAL_MAP = {
         {x = -347.2, y = 100.3, z = -124.1},
         {x = -393.1, y = 97.5, z = 278.7},
         {x = 302.6, y = 103.1, z = 313.7},
-    }
+    },
 }
 
 local JOB_MAP = {
@@ -43,24 +43,18 @@ local function debugPrint(message)
 end
 
 local function openSupportJob()
-    if IsAddonVisible("MKDSupportJob") then
-        return
-    end
-    repeat
+    while not IsAddonVisible("MKDSupportJob") do
         yield("/callback MKDInfo true 1 0")
         wait(intervalTime)
-    until IsAddonVisible("MKDSupportJob")
+    end
 end
 
 local function openSupportJobList()
-    if IsAddonVisible("MKDSupportJobList") then
-        return
-    end
-    openSupportJob()
-    repeat
+    while not IsAddonVisible("MKDSupportJobList") do
+        openSupportJob()
         yield("/callback MKDSupportJob true 0 0 0")
         wait(intervalTime)
-    until IsAddonVisible("MKDSupportJobList")
+    end
 end
 
 
@@ -106,13 +100,16 @@ local function changeSupportJob(jobName)
         end
         return
     end
+
     if HasStatusId(jobData.jobStatusId) then
         if debug then
             debugPrint("Job " .. jobName .. " is already active.")
         end
         return
     end
+
     openSupportJobList()
+
     repeat
         yield("/callback MKDSupportJobList true 0 " .. jobData.jobId)
         wait(intervalTime)
