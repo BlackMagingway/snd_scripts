@@ -4,6 +4,14 @@ local actionStatusThreshold = 1780
 local debug = false
 
 
+local CRYSTAL_MAP = {
+    {x = 835.9, y = 73.1, z = -709.3},
+    {x = -165.8, y = 6.5, z = -616.5},
+    {x = -347.2, y = 100.3, z = -124.1},
+    {x = -393.1, y = 97.5, z = 278.7},
+    {x = 302.6, y = 103.1, z = 313.7},
+}
+
 local JOB_MAP = {
     Freelancer = { jobId = 0, jobStatusId = 4242, actionId = "", actionStatusId = "" },
     Knight     = { jobId = 1, jobStatusId = 4358, actionId = 32, actionStatusId = 4233 },
@@ -63,6 +71,22 @@ local function getCurrentJobName()
     return nil
 end
 
+local function isNearAnyCrystal()
+    local name = GetCharacterName()
+    local playerX = GetPlayerRawXPos(name)
+    local playerZ = GetPlayerRawZPos(name)
+
+    for _, crystal in ipairs(CRYSTAL_MAP) do
+        local dx = playerX - crystal.x
+        local dz = playerZ - crystal.z
+        local distance = math.sqrt(dx * dx + dz * dz)
+        if distance <= 4.8 then
+            return true
+        end
+    end
+    return false
+end
+
 local function changeSupportJob(jobName)
     local jobData = JOB_MAP[jobName]
     if not jobData then
@@ -117,11 +141,18 @@ end
 
 
 local function main()
+    if not isNearAnyCrystal() then
+        if debug then
+            debugPrint("Not near any crystal. Aborting.")
+        end
+        return
+    end
+
     local originalJob = getCurrentJobName()
     if debug and originalJob then
         debugPrint("Original job: " .. originalJob)
     end
-    
+
     useSupportAction(JOB_ORDER)
 
     if originalJob then
