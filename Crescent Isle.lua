@@ -1,6 +1,8 @@
+local JOB_ORDER = { "Knight", "Bard", "Monk" }
 local intervalTime = 0.1
 local actionStatusThreshold = 1780
 local debug = false
+
 
 local JOB_MAP = {
     Freelancer = { jobId = 0, jobStatusId = 4242, actionId = "", actionStatusId = "" },
@@ -49,6 +51,16 @@ local function openSupportJobList()
         yield("/callback MKDSupportJob true 0 0 0")
         wait(intervalTime)
     until IsAddonVisible("MKDSupportJobList")
+end
+
+
+local function getCurrentJobName()
+    for jobName, data in pairs(JOB_MAP) do
+        if HasStatusId(data.jobStatusId) then
+            return jobName
+        end
+    end
+    return nil
 end
 
 local function changeSupportJob(jobName)
@@ -103,24 +115,13 @@ local function useSupportAction(JOB_ORDER)
     end
 end
 
-local function getCurrentJobName()
-    for jobName, data in pairs(JOB_MAP) do
-        if HasStatusId(data.jobStatusId) then
-            return jobName
-        end
-    end
-    return nil
-end
 
 local function main()
     local originalJob = getCurrentJobName()
     if debug and originalJob then
         debugPrint("Original job: " .. originalJob)
     end
-
-    local JOB_ORDER = {
-        "Knight", "Bard", "Monk",
-    }
+    
     useSupportAction(JOB_ORDER)
 
     if originalJob then
