@@ -5,11 +5,13 @@ local debug = false
 
 
 local CRYSTAL_MAP = {
-    {x = 835.9, y = 73.1, z = -709.3},
-    {x = -165.8, y = 6.5, z = -616.5},
-    {x = -347.2, y = 100.3, z = -124.1},
-    {x = -393.1, y = 97.5, z = 278.7},
-    {x = 302.6, y = 103.1, z = 313.7},
+    [1252] = { -- South Horn
+        {x = 835.9, y = 73.1, z = -709.3},
+        {x = -165.8, y = 6.5, z = -616.5},
+        {x = -347.2, y = 100.3, z = -124.1},
+        {x = -393.1, y = 97.5, z = 278.7},
+        {x = 302.6, y = 103.1, z = 313.7},
+    }
 }
 
 local JOB_MAP = {
@@ -72,11 +74,20 @@ local function getCurrentJobName()
 end
 
 local function isNearAnyCrystal()
+    local zoneId = GetZoneID()
+    local crystalList = CRYSTAL_MAP[zoneId]
+    if not crystalList then
+        if debug then
+            debugPrint("No crystals found for Zone ID " .. tostring(zoneId))
+        end
+        return false
+    end
+
     local name = GetCharacterName()
     local playerX = GetPlayerRawXPos(name)
     local playerZ = GetPlayerRawZPos(name)
 
-    for _, crystal in ipairs(CRYSTAL_MAP) do
+    for _, crystal in ipairs(crystalList) do
         local dx = playerX - crystal.x
         local dz = playerZ - crystal.z
         local distance = math.sqrt(dx * dx + dz * dz)
