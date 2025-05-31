@@ -30,6 +30,11 @@ local JOB_MAP = {
     Thief      = { jobId = 12, jobStatusId = 4369, actionId = "", actionStatusId = "" },
 }
 
+local JOB_MAP_LOWER = {}
+for name, data in pairs(JOB_MAP) do
+    JOB_MAP_LOWER[string.lower(name)] = data
+end
+
 local function wait(second)
     if second > 0 then
         yield("/wait " .. second)
@@ -37,7 +42,7 @@ local function wait(second)
 end
 
 local function debugPrint(message)
-    if message then
+    if message and debug then
         yield("/e " .. tostring(message))
     end
 end
@@ -71,9 +76,7 @@ local function isNearAnyCrystal()
     local zoneId = GetZoneID()
     local crystalList = CRYSTAL_MAP[zoneId]
     if not crystalList then
-        if debug then
-            debugPrint("No crystals found for Zone ID " .. tostring(zoneId))
-        end
+        debugPrint("No crystals found for Zone ID " .. tostring(zoneId))
         return false
     end
 
@@ -93,18 +96,15 @@ local function isNearAnyCrystal()
 end
 
 local function changeSupportJob(jobName)
-    local jobData = JOB_MAP[jobName]
+    local jobKey = string.lower(jobName)
+    local jobData = JOB_MAP_LOWER[jobKey]
     if not jobData then
-        if debug then
-            debugPrint("Invalid job name: " .. tostring(jobName))
-        end
+        debugPrint("Invalid job name: " .. tostring(jobName))
         return
     end
 
     if HasStatusId(jobData.jobStatusId) then
-        if debug then
-            debugPrint("Job " .. jobName .. " is already active.")
-        end
+        debugPrint("Job " .. jobName .. " is already active.")
         return
     end
 
@@ -118,19 +118,16 @@ end
 
 local function useSupportAction(JOB_ORDER)
     for __, jobName in ipairs(JOB_ORDER) do
-        local jobData = JOB_MAP[jobName]
+        local jobKey = string.lower(jobName)
+        local jobData = JOB_MAP_LOWER[jobKey]
 
         if not jobData then
-            if debug then
-                debugPrint("Invalid job name: " .. tostring(jobName))
-            end
+            debugPrint("Invalid job name: " .. tostring(jobName))
             goto continue
         end
 
         if jobData.actionStatusId ~= "" and GetStatusTimeRemaining(jobData.actionStatusId) >= actionStatusThreshold then
-            if debug then
-                debugPrint("Job " .. jobName .. " status is still active.")
-            end
+            debugPrint("Job " .. jobName .. " status is still active.")
             goto continue
         end
 
@@ -150,23 +147,17 @@ end
 
 local function main()
     if not isNearAnyCrystal() then
-        if debug then
-            debugPrint("Not near any crystal. Aborting.")
-        end
+        debugPrint("Not near any crystal. Aborting.")
         return
     end
 
     local originalJob = getCurrentJobName()
-    if debug and originalJob then
-        debugPrint("Original job: " .. originalJob)
-    end
+    debugPrint("Original job: " .. originalJob)
 
     useSupportAction(JOB_ORDER)
 
     if originalJob then
-        if debug then
-            debugPrint("Reverting to original job: " .. originalJob)
-        end
+        debugPrint("Reverting to original job: " .. originalJob)
         changeSupportJob(originalJob)
     end
 end
