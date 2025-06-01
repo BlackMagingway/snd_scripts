@@ -16,12 +16,12 @@ local CRYSTAL_MAP = {
 
 local JOB_MAP = {
     Freelancer = { jobId = 0, jobStatusId = 4242, actionId = "", actionStatusId = "" },
-    Knight     = { jobId = 1, jobStatusId = 4358, actionId = 32, actionStatusId = 4233 },
+    Knight     = { jobId = 1, jobStatusId = 4358, actionId = 32, actionStatusId = 4233, actionLevel = 2 },
     Berserker  = { jobId = 2, jobStatusId = 4359, actionId = "", actionStatusId = "" },
-    Monk       = { jobId = 3, jobStatusId = 4360, actionId = 33, actionStatusId = 4239 },
+    Monk       = { jobId = 3, jobStatusId = 4360, actionId = 33, actionStatusId = 4239, actionLevel = 3 },
     Ranger     = { jobId = 4, jobStatusId = 4361, actionId = "", actionStatusId = "" },
     Samurai    = { jobId = 5, jobStatusId = 4362, actionId = "", actionStatusId = "" },
-    Bard       = { jobId = 6, jobStatusId = 4363, actionId = 32, actionStatusId = 4244 },
+    Bard       = { jobId = 6, jobStatusId = 4363, actionId = 32, actionStatusId = 4244, actionLevel = 2  },
     Geomancer  = { jobId = 7, jobStatusId = 4364, actionId = "", actionStatusId = "" },
     TimeMage   = { jobId = 8, jobStatusId = 4365, actionId = "", actionStatusId = "" },
     Cannoneer  = { jobId = 9, jobStatusId = 4366, actionId = "", actionStatusId = "" },
@@ -70,6 +70,15 @@ local function getCurrentJobName()
         end
     end
     return nil
+end
+
+local function getCurrentJobLevel()
+    local level = GetNodeText("MKDInfo", 32)
+    if level then
+        return tonumber(level)
+    end
+
+    return 1
 end
 
 local function isNearAnyCrystal()
@@ -133,7 +142,7 @@ local function useSupportAction(JOB_ORDER)
 
         changeSupportJob(jobName)
 
-        if jobData.actionId ~= "" then
+        if jobData.actionId ~= "" and getCurrentJobLevel() >= jobData.actionLevel then
             repeat
                 ExecuteGeneralAction(jobData.actionId)
                 wait(intervalTime)
