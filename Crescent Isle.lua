@@ -1,6 +1,6 @@
 local JOB_ORDER = { "Knight", "Bard", "Monk" }
 local jobChangeCommand = "/phantomjob" -- Need SimpleTweaksCommand
-local language = "jp"
+local language = "en"
 local intervalTime = 0.1
 local actionStatusThreshold = 1780
 local debug = false
