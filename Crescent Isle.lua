@@ -17,20 +17,21 @@ local CRYSTAL_MAP = {
 }
 
 local JOB_MAP = {
+
     Freelancer = { jobName = {jp = "すっぴん", en = "Freelancer", de = "Freiberufler", fr = "Freelance" },
                     jobStatusId = 4357, actionId = "", actionStatusId = "" },
     Knight     = { jobName = {jp = "ナイト", en = "Knight", de = "Ritter", fr = "Paladin" },
-                    jobStatusId = 4358, actionId = 32, actionStatusId = 4233 },
+                    jobStatusId = 4358, actionId = 32, actionStatusId = 4233, actionLevel = 2  },
     Berserker  = { jobName = {jp = "バーサーカー", en = "Berserker", de = "Berserker", fr = "Berserker" },
                     jobStatusId = 4359, actionId = "", actionStatusId = "" },
     Monk       = { jobName = {jp = "モンク", en = "Monk", de = "Mönch", fr = "Moine" },
-                    jobStatusId = 4360, actionId = 33, actionStatusId = 4239 },
+                    jobStatusId = 4360, actionId = 33, actionStatusId = 4239, actionLevel = 3 },
     Ranger     = { jobName = {jp = "狩人", en = "Ranger", de = "Jäger", fr = "Rôdeur" },
                     jobStatusId = 4361, actionId = "", actionStatusId = "" },
     Samurai    = { jobName = {jp = "侍", en = "Samurai", de = "Samurai", fr = "Samouraï" },
                     jobStatusId = 4362, actionId = "", actionStatusId = "" },
     Bard       = { jobName = {jp = "吟遊詩人", en = "Bard", de = "Barde", fr = "Barde" },
-                    jobStatusId = 4363, actionId = 32, actionStatusId = 4244 },
+                    jobStatusId = 4363, actionId = 32, actionStatusId = 4244, actionLevel = 2 },
     Geomancer  = { jobName = { jp = "風水士", en = "Geomancer", de = "Geomant", fr = "Chronomancien" },
                     jobStatusId = 4364, actionId = "", actionStatusId = "" },
     TimeMage   = { jobName = {jp = "時魔道士", en = "Time Mage", de = "Zeitmagier", fr = "Artilleur" },
@@ -74,6 +75,15 @@ local function getCurrentJobName()
         end
     end
     return nil
+end
+
+local function getCurrentJobLevel()
+    local level = GetNodeText("MKDInfo", 32)
+    if level then
+        return tonumber(level)
+    end
+
+    return 1
 end
 
 local function isNearAnyCrystal()
@@ -137,7 +147,7 @@ local function useSupportAction(JOB_ORDER)
 
         changeSupportJob(jobName)
 
-        if jobData.actionId ~= "" then
+        if jobData.actionId ~= "" and getCurrentJobLevel() >= jobData.actionLevel then
             repeat
                 ExecuteGeneralAction(jobData.actionId)
                 wait(intervalTime)
