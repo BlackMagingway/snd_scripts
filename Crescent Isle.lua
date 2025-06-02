@@ -1,4 +1,6 @@
 local JOB_ORDER = { "Knight", "Bard", "Monk" }
+local jobChangeCommand = "/phantomjob" -- Need SimpleTweaksCommand
+local language = "en"
 local intervalTime = 0.1
 local actionStatusThreshold = 1780
 local debug = false
@@ -15,19 +17,32 @@ local CRYSTAL_MAP = {
 }
 
 local JOB_MAP = {
-    Freelancer = { jobId = 0, jobStatusId = 4242, actionId = "", actionStatusId = "" },
-    Knight     = { jobId = 1, jobStatusId = 4358, actionId = 32, actionStatusId = 4233 },
-    Berserker  = { jobId = 2, jobStatusId = 4359, actionId = "", actionStatusId = "" },
-    Monk       = { jobId = 3, jobStatusId = 4360, actionId = 33, actionStatusId = 4239 },
-    Ranger     = { jobId = 4, jobStatusId = 4361, actionId = "", actionStatusId = "" },
-    Samurai    = { jobId = 5, jobStatusId = 4362, actionId = "", actionStatusId = "" },
-    Bard       = { jobId = 6, jobStatusId = 4363, actionId = 32, actionStatusId = 4244 },
-    Geomancer  = { jobId = 7, jobStatusId = 4364, actionId = "", actionStatusId = "" },
-    TimeMage   = { jobId = 8, jobStatusId = 4365, actionId = "", actionStatusId = "" },
-    Cannoneer  = { jobId = 9, jobStatusId = 4366, actionId = "", actionStatusId = "" },
-    Chemist    = { jobId = 10, jobStatusId = 4367, actionId = "", actionStatusId = "" },
-    Oracle     = { jobId = 11, jobStatusId = 4368, actionId = "", actionStatusId = "" },
-    Thief      = { jobId = 12, jobStatusId = 4369, actionId = "", actionStatusId = "" },
+    Freelancer = { jobName = {jp = "すっぴん", en = "Freelancer", de = "Freiberufler", fr = "Freelance" },
+                    jobStatusId = 4357, actionId = "", actionStatusId = "" },
+    Knight     = { jobName = {jp = "ナイト", en = "Knight", de = "Ritter", fr = "Paladin" },
+                    jobStatusId = 4358, actionId = 32, actionStatusId = 4233 },
+    Berserker  = { jobName = {jp = "バーサーカー", en = "Berserker", de = "Berserker", fr = "Berserker" },
+                    jobStatusId = 4359, actionId = "", actionStatusId = "" },
+    Monk       = { jobName = {jp = "モンク", en = "Monk", de = "Mönch", fr = "Moine" },
+                    jobStatusId = 4360, actionId = 33, actionStatusId = 4239 },
+    Ranger     = { jobName = {jp = "狩人", en = "Ranger", de = "Jäger", fr = "Rôdeur" },
+                    jobStatusId = 4361, actionId = "", actionStatusId = "" },
+    Samurai    = { jobName = {jp = "侍", en = "Samurai", de = "Samurai", fr = "Samouraï" },
+                    jobStatusId = 4362, actionId = "", actionStatusId = "" },
+    Bard       = { jobName = {jp = "吟遊詩人", en = "Bard", de = "Barde", fr = "Barde" },
+                    jobStatusId = 4363, actionId = 32, actionStatusId = 4244 },
+    Geomancer  = { jobName = { jp = "風水士", en = "Geomancer", de = "Geomant", fr = "Chronomancien" },
+                    jobStatusId = 4364, actionId = "", actionStatusId = "" },
+    TimeMage   = { jobName = {jp = "時魔道士", en = "Time Mage", de = "Zeitmagier", fr = "Artilleur" },
+                    jobStatusId = 4365, actionId = "", actionStatusId = "" },
+    Cannoneer  = { jobName = {jp = "砲撃士", en = "Cannoneer", de = "Grenadier", fr = "Canonier" },
+                    jobStatusId = 4366, actionId = "", actionStatusId = "" },
+    Chemist    = { jobName = {jp = "薬師", en = "Chemist", de = "Alchemist", fr = "Alchimiste" },
+                    jobStatusId = 4367, actionId = "", actionStatusId = "" },
+    Oracle     = { jobName = {jp = "予言士", en = "Oracle", de = "Seher", fr = "Devin" },
+                    jobStatusId = 4368, actionId = "", actionStatusId = "" },
+    Thief      = { jobName = {jp = "シーフ", en = "Thief", de = "Dieb", fr = "Voleur" },
+                    jobStatusId = 4369, actionId = "", actionStatusId = "" },
 }
 
 local JOB_MAP_LOWER = {}
@@ -47,26 +62,15 @@ local function debugPrint(message)
     end
 end
 
-local function openSupportJob()
-    while not IsAddonVisible("MKDSupportJob") do
-        yield("/callback MKDInfo true 1 0")
-        wait(intervalTime)
-    end
-end
-
-local function openSupportJobList()
-    while not IsAddonVisible("MKDSupportJobList") do
-        openSupportJob()
-        yield("/callback MKDSupportJob true 0 0 0")
-        wait(intervalTime)
-    end
-end
-
-
 local function getCurrentJobName()
     for jobName, data in pairs(JOB_MAP) do
         if HasStatusId(data.jobStatusId) then
-            return jobName
+            local lang = language or "en"
+            if data.jobName[lang] then
+                return data.jobName[lang]
+            else
+                return data.jobName["en"]
+            end
         end
     end
     return nil
@@ -108,10 +112,10 @@ local function changeSupportJob(jobName)
         return
     end
 
-    openSupportJobList()
-
+    local lang = language or "en"
+    local jobNameLocalized = jobData.jobName[lang] or jobData.jobName["en"]
     repeat
-        yield("/callback MKDSupportJobList true 0 " .. jobData.jobId)
+        yield(jobChangeCommand .." ".. jobNameLocalized)
         wait(intervalTime)
     until HasStatusId(jobData.jobStatusId)
 end
