@@ -1,7 +1,6 @@
 local JOB_ORDER = { "Knight", "Bard", "Monk" }
 local useSimpleTweaksCommand = true -- Need Simple Tweaks Command
 local jobChangeCommand = "/phantomjob"
-local language = "en" -- "en", "jp", "de", "fr"
 local intervalTime = 0.1
 local actionStatusThreshold = 1780
 local debug = false
@@ -33,7 +32,7 @@ local JOB_MAP = {
                     jobId = 5, jobStatusId = 4362, actionId = "", actionStatusId = "" },
     Bard       = { jobName = {jp = "吟遊詩人", en = "Bard", de = "Barde", fr = "Barde" },
                     jobId = 6, jobStatusId = 4363, actionId = 32, actionStatusId = 4244, actionLevel = 2 },
-    Geomancer  = { jobName = { jp = "風水士", en = "Geomancer", de = "Geomant", fr = "Chronomancien" },
+    Geomancer  = { jobName = {jp = "風水士", en = "Geomancer", de = "Geomant", fr = "Chronomancien" },
                     jobId = 7, jobStatusId = 4364, actionId = "", actionStatusId = "" },
     TimeMage   = { jobName = {jp = "時魔道士", en = "Time Mage", de = "Zeitmagier", fr = "Artilleur" },
                     jobId = 8, jobStatusId = 4365, actionId = "", actionStatusId = "" },
@@ -77,6 +76,22 @@ local function openSupportJobList()
         yield("/callback MKDSupportJob true 0 0 0")
         wait(intervalTime)
     end
+end
+
+local function getClientLanguage()
+    local jobNameText = GetNodeText("MKDInfo", 34)
+    if jobNameText then
+        if string.find(jobNameText, "サポート") then
+            return "jp"
+        elseif string.find(jobNameText, "Phantom ") then
+            return "en"
+        elseif string.find(jobNameText, "Phantom%-") then
+            return "de"
+        elseif string.find(jobNameText, "fantôme") then
+            return "fr"
+        end
+    end
+    return "en"
 end
 
 local function getCurrentJobName()
@@ -134,7 +149,7 @@ local function changeSupportJob(jobName)
     end
 
     if useSimpleTweaksCommand then
-        local lang = language or "en"
+        local lang = getClientLanguage()
         local jobNameLocalized = jobData.jobName[lang] or jobData.jobName["en"]
         repeat
             yield(jobChangeCommand .." ".. jobNameLocalized)
