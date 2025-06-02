@@ -1,6 +1,6 @@
 local JOB_ORDER = { "Knight", "Bard", "Monk" }
 local jobChangeCommand = "/phantomjob" -- Need SimpleTweaksCommand
-local language = "en"
+local language = "jp"
 local intervalTime = 0.1
 local actionStatusThreshold = 1780
 local debug = false
@@ -66,12 +66,7 @@ end
 local function getCurrentJobName()
     for jobName, data in pairs(JOB_MAP) do
         if HasStatusId(data.jobStatusId) then
-            local lang = language or "en"
-            if data.jobName[lang] then
-                return data.jobName[lang]
-            else
-                return data.jobName["en"]
-            end
+            return jobName
         end
     end
     return nil
