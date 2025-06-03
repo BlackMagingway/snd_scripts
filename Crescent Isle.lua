@@ -88,7 +88,7 @@ local JOB_MAP = {
         jobId = 8,
         jobStatusId = 4365,
         actions = {
-            { actionId = 35, actionStatusId = 4261, actionLevel = 5, statusTime = 10 },
+            { actionId = 35, actionStatusId = 4260, actionLevel = 5, statusTime = 20 },
         }
     },
     Cannoneer = {
@@ -278,12 +278,16 @@ local function useSupportAction(JOBACTION_ORDER)
             if action.actionId and getCurrentJobLevel() >= action.actionLevel then
                 if threshold <= 0 then
                     repeat
-                        ExecuteGeneralAction(action.actionId)
+                        if not GetCharacterCondition(27) then
+                            ExecuteGeneralAction(action.actionId)
+                        end
                         wait(intervalTime)
                     until HasStatusId(action.actionStatusId)
                 else
                     repeat
-                        ExecuteGeneralAction(action.actionId)
+                        if not GetCharacterCondition(27) then
+                            ExecuteGeneralAction(action.actionId)
+                        end
                         wait(intervalTime)
                     until HasStatusId(action.actionStatusId) and GetStatusTimeRemaining(action.actionStatusId) >= threshold
                 end
