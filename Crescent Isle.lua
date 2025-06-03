@@ -1,8 +1,13 @@
-local JOB_ORDER = { "Knight", "Bard", "Monk" }
+local JOBACTION_ORDER = { --Job names are available in multiple languages.
+    { job = "Ritter", actions = {1} },
+    { job = "吟遊詩人", actions = {1} },
+    { job = "monk", actions = {1} },
+    -- { job = "Geomancer", actions = {2,1} }, -- Multiple skills can be specified for a single job.
+}
 local useSimpleTweaksCommand = true -- Need Simple Tweaks Command
 local jobChangeCommand = "/phantomjob"
-local intervalTime = 0.1
-local actionStatusThreshold = 1780
+local intervalTime = 0.1 -- seconds
+local actionStatusThreshold = 10 -- seconds
 local debug = false
 
 
@@ -17,38 +22,116 @@ local CRYSTAL_MAP = {
 }
 
 local JOB_MAP = {
-
-    Freelancer = { jobName = {jp = "すっぴん", en = "Freelancer", de = "Freiberufler", fr = "Freelance" },
-                    jobId = 0, jobStatusId = 4357, actionId = "", actionStatusId = "" },
-    Knight     = { jobName = {jp = "ナイト", en = "Knight", de = "Ritter", fr = "Paladin" },
-                    jobId = 1, jobStatusId = 4358, actionId = 32, actionStatusId = 4233, actionLevel = 2  },
-    Berserker  = { jobName = {jp = "バーサーカー", en = "Berserker", de = "Berserker", fr = "Berserker" },
-                    jobId = 2, jobStatusId = 4359, actionId = "", actionStatusId = "" },
-    Monk       = { jobName = {jp = "モンク", en = "Monk", de = "Mönch", fr = "Moine" },
-                    jobId = 3, jobStatusId = 4360, actionId = 33, actionStatusId = 4239, actionLevel = 3 },
-    Ranger     = { jobName = {jp = "狩人", en = "Ranger", de = "Jäger", fr = "Rôdeur" },
-                    jobId = 4, jobStatusId = 4361, actionId = "", actionStatusId = "" },
-    Samurai    = { jobName = {jp = "侍", en = "Samurai", de = "Samurai", fr = "Samouraï" },
-                    jobId = 5, jobStatusId = 4362, actionId = "", actionStatusId = "" },
-    Bard       = { jobName = {jp = "吟遊詩人", en = "Bard", de = "Barde", fr = "Barde" },
-                    jobId = 6, jobStatusId = 4363, actionId = 32, actionStatusId = 4244, actionLevel = 2 },
-    Geomancer  = { jobName = {jp = "風水士", en = "Geomancer", de = "Geomant", fr = "Chronomancien" },
-                    jobId = 7, jobStatusId = 4364, actionId = "", actionStatusId = "" },
-    TimeMage   = { jobName = {jp = "時魔道士", en = "Time Mage", de = "Zeitmagier", fr = "Artilleur" },
-                    jobId = 8, jobStatusId = 4365, actionId = "", actionStatusId = "" },
-    Cannoneer  = { jobName = {jp = "砲撃士", en = "Cannoneer", de = "Grenadier", fr = "Canonier" },
-                    jobId = 9, jobStatusId = 4366, actionId = "", actionStatusId = "" },
-    Chemist    = { jobName = {jp = "薬師", en = "Chemist", de = "Alchemist", fr = "Alchimiste" },
-                    jobId = 10, jobStatusId = 4367, actionId = "", actionStatusId = "" },
-    Oracle     = { jobName = {jp = "予言士", en = "Oracle", de = "Seher", fr = "Devin" },
-                    jobId = 11, jobStatusId = 4368, actionId = "", actionStatusId = "" },
-    Thief      = { jobName = {jp = "シーフ", en = "Thief", de = "Dieb", fr = "Voleur" },
-                    jobId = 12, jobStatusId = 4369, actionId = "", actionStatusId = "" },
+    Freelancer = {
+        jobName = { jp = "すっぴん", en = "Freelancer", de = "Freiberufler", fr = "Freelance" },
+        jobId = 0,
+        jobStatusId = 4357,
+        actions = {}
+    },
+    Knight = {
+        jobName = { jp = "ナイト", en = "Knight", de = "Ritter", fr = "Paladin" },
+        jobId = 1,
+        jobStatusId = 4358,
+        actions = {
+            { actionId = 32, actionStatusId = 4233, actionLevel = 2, statusTime = 1800, crystal = true },
+        }
+    },
+    Berserker = {
+        jobName = { jp = "バーサーカー", en = "Berserker", de = "Berserker", fr = "Berserker" },
+        jobId = 2,
+        jobStatusId = 4359,
+        actions = {
+        }
+    },
+    Monk = {
+        jobName = { jp = "モンク", en = "Monk", de = "Mönch", fr = "Moine" },
+        jobId = 3,
+        jobStatusId = 4360,
+        actions = {
+            { actionId = 33, actionStatusId = 4239, actionLevel = 3, statusTime = 1800, crystal = true },
+        }
+    },
+    Ranger = {
+        jobName = { jp = "狩人", en = "Ranger", de = "Jäger", fr = "Rôdeur" },
+        jobId = 4,
+        jobStatusId = 4361,
+        actions = {
+        }
+    },
+    Samurai = {
+        jobName = { jp = "侍", en = "Samurai", de = "Samurai", fr = "Samouraï" },
+        jobId = 5,
+        jobStatusId = 4362,
+        actions = {
+        }
+    },
+    Bard = {
+        jobName = { jp = "吟遊詩人", en = "Bard", de = "Barde", fr = "Barde" },
+        jobId = 6,
+        jobStatusId = 4363,
+        actions = {
+            { actionId = 32, actionStatusId = 4244, actionLevel = 2, statusTime = 1800, crystal = true },
+            { actionId = 31, actionStatusId = 4247, actionLevel = 1, statusTime = 70 },
+        }
+    },
+    Geomancer = {
+        jobName = { jp = "風水士", en = "Geomancer", de = "Geomant", fr = "Chronomancien" },
+        jobId = 7,
+        jobStatusId = 4364,
+        actions = {
+            { actionId = 31, actionStatusId = 4251, actionLevel = 1, statusTime = 60 },
+            { actionId = 34, actionStatusId = 4258, actionLevel = 4, statusTime = 60 },
+        }
+    },
+    TimeMage = {
+        jobName = { jp = "時魔道士", en = "Time Mage", de = "Zeitmagier", fr = "Artilleur" },
+        jobId = 8,
+        jobStatusId = 4365,
+        actions = {
+            { actionId = 35, actionStatusId = 4261, actionLevel = 5, statusTime = 10 },
+        }
+    },
+    Cannoneer = {
+        jobName = { jp = "砲撃士", en = "Cannoneer", de = "Grenadier", fr = "Canonier" },
+        jobId = 9,
+        jobStatusId = 4366,
+        actions = {
+        }
+    },
+    Chemist = {
+        jobName = { jp = "薬師", en = "Chemist", de = "Alchemist", fr = "Alchimiste" },
+        jobId = 10,
+        jobStatusId = 4367,
+        actions = {
+        }
+    },
+    Oracle = {
+        jobName = { jp = "予言士", en = "Oracle", de = "Seher", fr = "Devin" },
+        jobId = 11,
+        jobStatusId = 4368,
+        actions = {
+        }
+    },
+    Thief = {
+        jobName = { jp = "シーフ", en = "Thief", de = "Dieb", fr = "Voleur" },
+        jobId = 12,
+        jobStatusId = 4369,
+        actions = {
+            { actionId = 31, actionStatusId = 4276, actionLevel = 1, statusTime = 10 },
+        }
+    },
 }
 
-local JOB_MAP_LOWER = {}
-for name, data in pairs(JOB_MAP) do
-    JOB_MAP_LOWER[string.lower(name)] = data
+local function findJobKeyByAnyName(name)
+    local nameLower = string.lower(name)
+    for key, data in pairs(JOB_MAP) do
+        for lang, jobName in pairs(data.jobName) do
+            if string.lower(jobName) == nameLower then
+                return key
+            end
+        end
+    end
+    return nil
 end
 
 local function wait(second)
@@ -94,7 +177,7 @@ local function getClientLanguage()
     return "en"
 end
 
-local function getCurrentJobName()
+local function getOriginalJobName()
     for jobName, data in pairs(JOB_MAP) do
         if HasStatusId(data.jobStatusId) then
             return jobName
@@ -136,23 +219,19 @@ local function isNearAnyCrystal()
 end
 
 local function changeSupportJob(jobName)
-    local jobKey = string.lower(jobName)
-    local jobData = JOB_MAP_LOWER[jobKey]
+    local jobKey = findJobKeyByAnyName(jobName)
+    local jobData = jobKey and JOB_MAP[jobKey] or nil
     if not jobData then
         debugPrint("Invalid job name: " .. tostring(jobName))
         return
     end
-
     if HasStatusId(jobData.jobStatusId) then
         debugPrint("Job " .. jobName .. " is already active.")
         return
     end
-
     if useSimpleTweaksCommand then
-        local lang = getClientLanguage()
-        local jobNameLocalized = jobData.jobName[lang] or jobData.jobName["en"]
         repeat
-            yield(jobChangeCommand .." ".. jobNameLocalized)
+            yield(jobChangeCommand .. " " .. jobData.jobId)
             wait(intervalTime)
         until HasStatusId(jobData.jobStatusId)
     else
@@ -162,48 +241,61 @@ local function changeSupportJob(jobName)
             wait(intervalTime)
         until HasStatusId(jobData.jobStatusId)
     end
-
 end
 
-local function useSupportAction(JOB_ORDER)
-    for __, jobName in ipairs(JOB_ORDER) do
-        local jobKey = string.lower(jobName)
-        local jobData = JOB_MAP_LOWER[jobKey]
-
+local function useSupportAction(JOBACTION_ORDER)
+    for __, jobEntry in ipairs(JOBACTION_ORDER) do
+        local jobNameInput = jobEntry.job
+        local jobKey = findJobKeyByAnyName(jobNameInput)
+        local jobData = jobKey and JOB_MAP[jobKey] or nil
         if not jobData then
-            debugPrint("Invalid job name: " .. tostring(jobName))
+            debugPrint("Invalid job name: " .. tostring(jobNameInput))
             goto continue
         end
-
-        if jobData.actionStatusId ~= "" and GetStatusTimeRemaining(jobData.actionStatusId) >= actionStatusThreshold then
-            debugPrint("Job " .. jobName .. " status is still active.")
-            goto continue
+        local actionIndexes = jobEntry.actions or {1}
+        for _, idx in ipairs(actionIndexes) do
+            local action = jobData.actions[idx]
+            if not action then
+                debugPrint("No action index "..tostring(idx).." for job "..jobNameInput)
+                goto action_continue
+            end
+            if action.crystal == true and not isNearAnyCrystal() then
+                debugPrint("Action requires crystal, but not near any crystal. Skipping job change and action.")
+                goto action_continue
+            end
+            changeSupportJob(jobData.jobName["en"] or jobKey)
+            local threshold = (action.statusTime or 0) - actionStatusThreshold
+            debugPrint("Using job: " .. jobNameInput .. " action#"..idx.." with threshold: " .. threshold)
+            if action.actionStatusId and HasStatusId(action.actionStatusId) and GetStatusTimeRemaining(action.actionStatusId) >= threshold then
+                debugPrint("Job " .. jobNameInput .. " action#"..idx.." status is still active.")
+                goto action_continue
+            end
+            if action.actionId and getCurrentJobLevel() >= action.actionLevel then
+                if threshold <= 0 then
+                    repeat
+                        ExecuteGeneralAction(action.actionId)
+                        wait(intervalTime)
+                    until HasStatusId(action.actionStatusId)
+                else
+                    repeat
+                        ExecuteGeneralAction(action.actionId)
+                        wait(intervalTime)
+                    until HasStatusId(action.actionStatusId) and GetStatusTimeRemaining(action.actionStatusId) >= threshold
+                end
+            end
+            ::action_continue::
         end
-
-        changeSupportJob(jobName)
-
-        if jobData.actionId ~= "" and getCurrentJobLevel() >= jobData.actionLevel then
-            repeat
-                ExecuteGeneralAction(jobData.actionId)
-                wait(intervalTime)
-            until GetStatusTimeRemaining(jobData.actionStatusId) >= actionStatusThreshold
-        end
-
         ::continue::
     end
 end
 
 
 local function main()
-    if not isNearAnyCrystal() then
-        debugPrint("Not near any crystal. Aborting.")
-        return
-    end
 
-    local originalJob = getCurrentJobName()
+    local originalJob = getOriginalJobName()
     debugPrint("Original job: " .. originalJob)
 
-    useSupportAction(JOB_ORDER)
+    useSupportAction(JOBACTION_ORDER)
 
     if originalJob then
         debugPrint("Reverting to original job: " .. originalJob)
