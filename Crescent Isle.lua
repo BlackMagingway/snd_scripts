@@ -122,6 +122,11 @@ local JOB_MAP = {
     },
 }
 
+local JOB_MAP_LOWER = {}
+for name, data in pairs(JOB_MAP) do
+    JOB_MAP_LOWER[string.lower(name)] = data
+end
+
 local function findJobKeyByAnyName(name)
     local nameLower = string.lower(name)
     for key, data in pairs(JOB_MAP) do
@@ -246,8 +251,8 @@ end
 local function useSupportAction(JOBACTION_ORDER)
     for __, jobEntry in ipairs(JOBACTION_ORDER) do
         local jobNameInput = jobEntry.job
-        local jobKey = findJobKeyByAnyName(jobNameInput)
-        local jobData = jobKey and JOB_MAP[jobKey] or nil
+        local jobKey = findJobKeyByAnyName(jobNameInput) or string.lower(jobNameInput)
+        local jobData = JOB_MAP[jobKey] or JOB_MAP_LOWER[jobKey]
         if not jobData then
             debugPrint("Invalid job name: " .. tostring(jobNameInput))
             goto continue
