@@ -1,15 +1,18 @@
+-- Execute the action number defined in JOB_MAP.
+-- In this example, after executing “Offensive Aria”, ‘Suspend’, “Battle Bell”, and “Occult Sprint”, it returns to the original job.
 -- Some actions share a recast, so not all may be available immediately.
--- If actions is omitted, the first defined action is executed.
 local JOBACTION_ORDER = {
     { job = "Bard", actions = {2} },
-    { job = "Geomancer", actions = {3,1} },
+    { job = "Geomancer", actions = {3, 1} },
     { job = "Thief", actions = {1} },
 }
 
-local SUPPORTACTION_ORDER = { --Job names are available in multiple languages.
-    { job = "Ritter" },
-    { job = "吟遊詩人" },
-    { job = "monk" },
+--Job names are available in multiple languages.
+-- If actions is omitted, the first defined action is executed.
+local SUPPORTACTION_ORDER = {
+    { job = "Knight" },
+    { job = "Bard" },
+    { job = "Monk" },
 }
 
 local useSimpleTweaksCommand = true -- Need Simple Tweaks Command
@@ -51,7 +54,7 @@ local JOB_MAP = {
         jobName = { jp = "バーサーカー", en = "Berserker", de = "Berserker", fr = "Berserker" },
         jobId = 2,
         jobStatusId = 4359,
-        actions = {m
+        actions = {
         }
     },
     Monk = {
