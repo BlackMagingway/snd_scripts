@@ -273,53 +273,80 @@ local function changeSupportJob(jobName)
     end
 end
 
-local function useSupportAction(JOBACTION_ORDER)
-    for __, jobEntry in ipairs(JOBACTION_ORDER) do
-        local jobNameInput = jobEntry.job
-        local jobKey = findJobKeyByAnyName(jobNameInput) or string.lower(jobNameInput)
-        local jobData = JOB_MAP[jobKey] or JOB_MAP_LOWER[jobKey]
+local function getJobData(jobNameInput)
+    local jobKey = findJobKeyByAnyName(jobNameInput) or string.lower(jobNameInput)
+    return JOB_MAP[jobKey] or JOB_MAP_LOWER[jobKey]
+end
+
+local function shouldSkipAction(action)
+    if action.crystal == true and not isNearAnyCrystal() then
+        debugPrint("Action requires crystal, but not near any crystal. Skipping.")
+        return true
+    end
+    return false
+end
+
+local function hasActiveStatus(action, threshold)
+    return action.actionStatusId and HasStatusId(action.actionStatusId)
+            and GetStatusTimeRemaining(action.actionStatusId) >= threshold
+end
+
+local function performAction(action)
+    local threshold = (action.statusTime or 0) - actionStatusThreshold
+    if not action.actionId or getCurrentJobLevel() < action.actionLevel then
+        return
+    end
+
+    debugPrint("Attempting to perform actionId: " .. tostring(action.actionId) .. " with threshold: " .. tostring(threshold))
+
+    local function tryExecute()
+        if not GetCharacterCondition(27) then
+            ExecuteGeneralAction(action.actionId)
+        end
+    end
+
+    if threshold <= 0 then
+        repeat
+            tryExecute()
+            wait(intervalTime)
+        until HasStatusId(action.actionStatusId)
+    else
+        repeat
+            tryExecute()
+            wait(intervalTime)
+        until hasActiveStatus(action, threshold)
+    end
+end
+
+local function useSupportAction(actionOrderList)
+    for _, jobEntry in ipairs(actionOrderList) do
+        local jobData = getJobData(jobEntry.job)
         if not jobData then
-            debugPrint("Invalid job name: " .. tostring(jobNameInput))
+            debugPrint("Invalid job name: " .. tostring(jobEntry.job))
             goto continue
         end
+
         local actionIndexes = jobEntry.actions or {1}
-        if not jobEntry.actions then
-            actionIndexes = {1}
-        end
         for _, idx in ipairs(actionIndexes) do
             local action = jobData.actions[idx]
             if not action then
-                debugPrint("No action index "..tostring(idx).." for job "..jobNameInput)
+                debugPrint("No action index " .. tostring(idx) .. " for job " .. jobEntry.job)
                 goto action_continue
             end
-            if action.crystal == true and not isNearAnyCrystal() then
-                debugPrint("Action requires crystal, but not near any crystal. Skipping job change and action.")
+
+            if shouldSkipAction(action) then
                 goto action_continue
             end
-            changeSupportJob(jobData.jobName["en"] or jobKey)
-            local threshold = (action.statusTime or 0) - actionStatusThreshold
-            debugPrint("Using job: " .. jobNameInput .. " action#"..idx.." with threshold: " .. threshold)
-            if action.actionStatusId and HasStatusId(action.actionStatusId) and GetStatusTimeRemaining(action.actionStatusId) >= threshold then
-                debugPrint("Job " .. jobNameInput .. " action#"..idx.." status is still active.")
+
+            changeSupportJob(jobData.jobName["en"] or jobEntry.job)
+
+            if hasActiveStatus(action, (action.statusTime or 0) - actionStatusThreshold) then
+                debugPrint("Action already active for job: " .. jobEntry.job .. " action#" .. idx)
                 goto action_continue
             end
-            if action.actionId and getCurrentJobLevel() >= action.actionLevel then
-                if threshold <= 0 then
-                    repeat
-                        if not GetCharacterCondition(27) then
-                            ExecuteGeneralAction(action.actionId)
-                        end
-                        wait(intervalTime)
-                    until HasStatusId(action.actionStatusId)
-                else
-                    repeat
-                        if not GetCharacterCondition(27) then
-                            ExecuteGeneralAction(action.actionId)
-                        end
-                        wait(intervalTime)
-                    until HasStatusId(action.actionStatusId) and GetStatusTimeRemaining(action.actionStatusId) >= threshold
-                end
-            end
+
+            performAction(action)
+
             ::action_continue::
         end
         ::continue::
@@ -338,7 +365,6 @@ local function main()
     else
         debugPrint("Not near any crystal, using job order actions")
         useSupportAction(JOBACTION_ORDER)
-        return
     end
 
     if originalJob then
