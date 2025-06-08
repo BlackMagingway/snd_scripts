@@ -4,6 +4,8 @@ local JOBACTION_ORDER = { --Job names are available in multiple languages.
     { job = "monk" },
     -- { job = "Geomancer", actions = {2,1} }, -- Multiple skills can be specified for a single job.
 }
+-- Some actions share a recast, so not all may be available immediately.
+
 local useSimpleTweaksCommand = true -- Need Simple Tweaks Command
 local jobChangeCommand = "/phantomjob"
 local intervalTime = 0.1 -- seconds
@@ -33,7 +35,10 @@ local JOB_MAP = {
         jobId = 1,
         jobStatusId = 4358,
         actions = {
-            { actionId = 32, actionStatusId = 4233, actionLevel = 2, statusTime = 1800, crystal = true }, -- Pray
+            { actionId = 32, actionStatusId = 4233, actionLevel = 2, statusTime = 1800, crystal = true }, -- Pray (30min buff)
+            { actionId = 31, actionStatusId = 4231, actionLevel = 1, statusTime = 10}, -- Phantom Guard
+            { actionId = 32, actionStatusId = 4232, actionLevel = 2, statusTime = 30}, -- Pray
+            { actionId = 34, actionStatusId = 4234, actionLevel = 6, statusTime = 10}, -- Pledge
         }
     },
     Berserker = {
@@ -48,7 +53,8 @@ local JOB_MAP = {
         jobId = 3,
         jobStatusId = 4360,
         actions = {
-            { actionId = 33, actionStatusId = 4239, actionLevel = 3, statusTime = 1800, crystal = true }, -- Counterstance
+            { actionId = 33, actionStatusId = 4239, actionLevel = 3, statusTime = 1800, crystal = true }, -- Counterstance (30min buff)
+            { actionId = 33, actionStatusId = 4238, actionLevel = 3, statusTime = 60 }, -- Counterstance
         }
     },
     Ranger = {
@@ -56,6 +62,8 @@ local JOB_MAP = {
         jobId = 4,
         jobStatusId = 4361,
         actions = {
+            { actionId = 31, actionStatusId = 4240, actionLevel = 1, statusTime = 30 }, -- Phantom Aim
+            { actionId = 34, actionStatusId = 4243, actionLevel = 6, statusTime = 30 }, -- Occult Unicorn
         }
     },
     Samurai = {
@@ -72,6 +80,8 @@ local JOB_MAP = {
         actions = {
             { actionId = 32, actionStatusId = 4244, actionLevel = 2, statusTime = 1800, crystal = true }, -- Romeo's Ballad
             { actionId = 31, actionStatusId = 4247, actionLevel = 1, statusTime = 70 }, -- Offensive Aria
+            { actionId = 33, actionStatusId = 4246, actionLevel = 3, statusTime = 30 }, -- Mighty March
+            { actionId = 34, actionStatusId = 4249, actionLevel = 4, statusTime = 20 }, -- Hero's Rime
         }
     },
     Geomancer = {
@@ -111,6 +121,9 @@ local JOB_MAP = {
         jobId = 11,
         jobStatusId = 4368,
         actions = {
+            { actionId = 32, actionStatusId = 4271, actionLevel = 2, statusTime = 20 }, -- Recuperation
+            { actionId = 34, actionStatusId = 4274, actionLevel = 4, statusTime = 20 }, -- Phantom Rejuvenation
+            { actionId = 35, actionStatusId = 4275, actionLevel = 5, statusTime = 20 }, -- Invulnerability
         }
     },
     Thief = {
