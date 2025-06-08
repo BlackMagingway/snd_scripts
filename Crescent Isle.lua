@@ -1,11 +1,16 @@
-local JOBACTION_ORDER = { --Job names are available in multiple languages.
+-- Some actions share a recast, so not all may be available immediately.
+-- If actions is omitted, the first defined action is executed.
+local JOBACTION_ORDER = {
+    { job = "Bard", actions = {2} },
+    { job = "Geomancer", actions = {3,1} },
+    { job = "Thief", actions = {1} },
+}
+
+local SUPPORTACTION_ORDER = { --Job names are available in multiple languages.
     { job = "Ritter" },
     { job = "吟遊詩人" },
     { job = "monk" },
-    -- { job = "Geomancer", actions = {2,1} }, -- Multiple skills can be specified for a single job.
 }
--- Some actions share a recast, so not all may be available immediately.
--- If actions is omitted, the first defined action is executed.
 
 local useSimpleTweaksCommand = true -- Need Simple Tweaks Command
 local jobChangeCommand = "/phantomjob"
@@ -324,7 +329,14 @@ local function main()
     local originalJob = getOriginalJobName()
     debugPrint("Original job: " .. originalJob)
 
-    useSupportAction(JOBACTION_ORDER)
+    if isNearAnyCrystal() then
+        debugPrint("Near a crystal, using support actions.")
+        useSupportAction(SUPPORTACTION_ORDER)
+    else
+        debugPrint("Not near any crystal, using job order actions")
+        useSupportAction(JOBACTION_ORDER)
+        return
+    end
 
     if originalJob then
         debugPrint("Reverting to original job: " .. originalJob)
