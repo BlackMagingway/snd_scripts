@@ -1,7 +1,7 @@
 local JOBACTION_ORDER = { --Job names are available in multiple languages.
-    { job = "Ritter", actions = {1} },
-    { job = "吟遊詩人", actions = {1} },
-    { job = "monk", actions = {1} },
+    { job = "Ritter" },
+    { job = "吟遊詩人" },
+    { job = "monk" },
     -- { job = "Geomancer", actions = {2,1} }, -- Multiple skills can be specified for a single job.
 }
 local useSimpleTweaksCommand = true -- Need Simple Tweaks Command
@@ -33,14 +33,14 @@ local JOB_MAP = {
         jobId = 1,
         jobStatusId = 4358,
         actions = {
-            { actionId = 32, actionStatusId = 4233, actionLevel = 2, statusTime = 1800, crystal = true },
+            { actionId = 32, actionStatusId = 4233, actionLevel = 2, statusTime = 1800, crystal = true }, -- Pray
         }
     },
     Berserker = {
         jobName = { jp = "バーサーカー", en = "Berserker", de = "Berserker", fr = "Berserker" },
         jobId = 2,
         jobStatusId = 4359,
-        actions = {
+        actions = {m
         }
     },
     Monk = {
@@ -48,7 +48,7 @@ local JOB_MAP = {
         jobId = 3,
         jobStatusId = 4360,
         actions = {
-            { actionId = 33, actionStatusId = 4239, actionLevel = 3, statusTime = 1800, crystal = true },
+            { actionId = 33, actionStatusId = 4239, actionLevel = 3, statusTime = 1800, crystal = true }, -- Counterstance
         }
     },
     Ranger = {
@@ -70,8 +70,8 @@ local JOB_MAP = {
         jobId = 6,
         jobStatusId = 4363,
         actions = {
-            { actionId = 32, actionStatusId = 4244, actionLevel = 2, statusTime = 1800, crystal = true },
-            { actionId = 31, actionStatusId = 4247, actionLevel = 1, statusTime = 70 },
+            { actionId = 32, actionStatusId = 4244, actionLevel = 2, statusTime = 1800, crystal = true }, -- Romeo's Ballad
+            { actionId = 31, actionStatusId = 4247, actionLevel = 1, statusTime = 70 }, -- Offensive Aria
         }
     },
     Geomancer = {
@@ -79,8 +79,9 @@ local JOB_MAP = {
         jobId = 7,
         jobStatusId = 4364,
         actions = {
-            { actionId = 31, actionStatusId = 4251, actionLevel = 1, statusTime = 60 },
-            { actionId = 34, actionStatusId = 4258, actionLevel = 4, statusTime = 60 },
+            { actionId = 31, actionStatusId = 4251, actionLevel = 1, statusTime = 60 }, -- Battle Bell
+            { actionId = 33, actionStatusId = 4257, actionLevel = 3, statusTime = 60 }, -- Ringing Respite
+            { actionId = 34, actionStatusId = 4258, actionLevel = 4, statusTime = 60 }, -- Suspend
         }
     },
     TimeMage = {
@@ -88,7 +89,7 @@ local JOB_MAP = {
         jobId = 8,
         jobStatusId = 4365,
         actions = {
-            { actionId = 35, actionStatusId = 4260, actionLevel = 5, statusTime = 20 },
+            { actionId = 35, actionStatusId = 4260, actionLevel = 5, statusTime = 20 }, -- Occult Quick
         }
     },
     Cannoneer = {
@@ -117,7 +118,9 @@ local JOB_MAP = {
         jobId = 12,
         jobStatusId = 4369,
         actions = {
-            { actionId = 31, actionStatusId = 4276, actionLevel = 1, statusTime = 10 },
+            { actionId = 31, actionStatusId = 4276, actionLevel = 1, statusTime = 10 }, -- Occult Sprint
+            { actionId = 33, actionStatusId = 4277, actionLevel = 3, statusTime = 20 }, -- Vigilance
+
         }
     },
 }
@@ -240,8 +243,8 @@ local function changeSupportJob(jobName)
             wait(intervalTime)
         until HasStatusId(jobData.jobStatusId)
     else
-        openSupportJobList()
         repeat
+            openSupportJobList()
             yield("/callback MKDSupportJobList true 0 " .. jobData.jobId)
             wait(intervalTime)
         until HasStatusId(jobData.jobStatusId)
@@ -258,6 +261,9 @@ local function useSupportAction(JOBACTION_ORDER)
             goto continue
         end
         local actionIndexes = jobEntry.actions or {1}
+        if not jobEntry.actions then
+            actionIndexes = {1}
+        end
         for _, idx in ipairs(actionIndexes) do
             local action = jobData.actions[idx]
             if not action then
