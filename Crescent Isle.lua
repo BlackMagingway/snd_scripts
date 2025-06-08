@@ -5,6 +5,7 @@ local JOBACTION_ORDER = { --Job names are available in multiple languages.
     -- { job = "Geomancer", actions = {2,1} }, -- Multiple skills can be specified for a single job.
 }
 -- Some actions share a recast, so not all may be available immediately.
+-- If actions is omitted, the first defined action is executed.
 
 local useSimpleTweaksCommand = true -- Need Simple Tweaks Command
 local jobChangeCommand = "/phantomjob"
@@ -123,7 +124,7 @@ local JOB_MAP = {
         actions = {
             { actionId = 32, actionStatusId = 4271, actionLevel = 2, statusTime = 20 }, -- Recuperation
             { actionId = 34, actionStatusId = 4274, actionLevel = 4, statusTime = 20 }, -- Phantom Rejuvenation
-            { actionId = 35, actionStatusId = 4275, actionLevel = 5, statusTime = 20 }, -- Invulnerability
+            { actionId = 35, actionStatusId = 4275, actionLevel = 5, statusTime = 8 }, -- Invulnerability
         }
     },
     Thief = {
