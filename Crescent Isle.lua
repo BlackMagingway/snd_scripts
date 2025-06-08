@@ -9,7 +9,7 @@ local JOBACTION_ORDER = {
 
 --Job names are available in multiple languages.
 -- If actions is omitted, the first defined action is executed.
-local SUPPORTACTION_ORDER = {
+local CRYSTALACTION_ORDER = {
     { job = "Knight" },
     { job = "Bard" },
     { job = "Monk" },
@@ -361,7 +361,7 @@ local function main()
 
     if isNearAnyCrystal() then
         debugPrint("Near a crystal, using support actions.")
-        useSupportAction(SUPPORTACTION_ORDER)
+        useSupportAction(CRYSTALACTION_ORDER)
     else
         debugPrint("Not near any crystal, using job order actions")
         useSupportAction(JOBACTION_ORDER)
