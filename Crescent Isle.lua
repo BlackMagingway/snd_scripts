@@ -71,7 +71,7 @@ local JOB_MAP = {
         jobId = 4,
         jobStatusId = 4361,
         actions = {
-            { actionId = 31, actionStatusId = 4240, actionLevel = 1, statusTime = 30 }, -- Phantom Aim
+            { actionId = 31, actionStatusId = {4240, 4241}, actionLevel = 1, statusTime = 30 }, -- Phantom Aim
             { actionId = 34, actionStatusId = 4243, actionLevel = 6, statusTime = 30 }, -- Occult Unicorn
         }
     },
@@ -99,6 +99,7 @@ local JOB_MAP = {
         jobStatusId = 4364,
         actions = {
             { actionId = 31, actionStatusId = 4251, actionLevel = 1, statusTime = 60 }, -- Battle Bell
+            -- { actionId = 32, actionStatusId = {4253, 4254, 4255, 4256, 4280}, actionLevel = 2, statusTime = 20 }, -- Weather --Cannot be used because it includes a non-buff skill.
             { actionId = 33, actionStatusId = 4257, actionLevel = 3, statusTime = 60 }, -- Ringing Respite
             { actionId = 34, actionStatusId = 4258, actionLevel = 4, statusTime = 60 }, -- Suspend
         }
@@ -287,9 +288,17 @@ local function shouldSkipAction(action)
 end
 
 local function hasActiveStatus(action, threshold)
-    return action.actionStatusId and HasStatusId(action.actionStatusId)
-            and GetStatusTimeRemaining(action.actionStatusId) >= threshold
+    if not action.actionStatusId then return false end
+
+    local ids = type(action.actionStatusId) == "table" and action.actionStatusId or { action.actionStatusId }
+    for _, id in ipairs(ids) do
+        if HasStatusId(id) and GetStatusTimeRemaining(id) >= threshold then
+            return true
+        end
+    end
+    return false
 end
+
 
 local function performAction(action)
     local threshold = (action.statusTime or 0) - actionStatusThreshold
